@@ -158,7 +158,7 @@ export default function StockPage() {
                     <Button
                         variant="outlined"
                         onClick={() =>
-                            window.open("http://localhost:8080/stock/export")
+                            window.open("https://non-stop-b-production.up.railway.app/stock/export")
                         }
                     >
                         Export Excel
