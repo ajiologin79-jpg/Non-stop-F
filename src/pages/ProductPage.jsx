@@ -4,7 +4,8 @@ import {
   Button,
   Paper,
   Box,
-  Typography
+  Typography,
+  Grid
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,7 @@ import {
 import DataTable from "../components/DataTable";
 
 export default function ProductPage() {
+
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
 
@@ -46,13 +48,15 @@ export default function ProductPage() {
         <Button
           size="small"
           variant="outlined"
+          fullWidth
           onClick={() => {
             const newQty = prompt("New Quantity", row.totalQuantity);
-            if (newQty)
+            if (newQty) {
               dispatch(updateProduct({
                 id: row.id,
                 data: { ...row, totalQuantity: newQty }
               }));
+            }
           }}
         >
           Edit
@@ -66,6 +70,7 @@ export default function ProductPage() {
         <Button
           size="small"
           color="error"
+          fullWidth
           onClick={() => dispatch(deleteProduct(row.id))}
         >
           Delete
@@ -75,36 +80,51 @@ export default function ProductPage() {
   ];
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 3 }}>
 
       <Typography variant="h5" gutterBottom>
         Product Management
       </Typography>
 
       <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Grid container spacing={2}>
 
-          <TextField
-            label="Product Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <Grid item xs={12} md={4}>
+            <TextField
+              label="Product Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+            />
+          </Grid>
 
-          <TextField
-            label="Quantity"
-            type="number"
-            value={qty}
-            onChange={(e) => setQty(e.target.value)}
-          />
+          <Grid item xs={12} md={4}>
+            <TextField
+              label="Quantity"
+              type="number"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+              fullWidth
+            />
+          </Grid>
 
-          <Button variant="contained" onClick={handleAdd}>
-            Add Product
-          </Button>
+          <Grid item xs={12} md={4}>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ height: "100%" }}
+              onClick={handleAdd}
+            >
+              Add Product
+            </Button>
+          </Grid>
 
-        </Box>
+        </Grid>
       </Paper>
 
-      <DataTable columns={columns} rows={products} />
+      <Box sx={{ overflowX: "auto" }}>
+        <DataTable columns={columns} rows={products} />
+      </Box>
 
     </Container>
   );

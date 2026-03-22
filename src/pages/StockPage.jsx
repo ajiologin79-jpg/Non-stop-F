@@ -1,175 +1,194 @@
 import {
-    Container,
-    TextField,
-    Button,
-    Select,
-    MenuItem,
-    Paper,
-    Box,
-    Typography
+  Container,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  Paper,
+  Box,
+  Typography,
+  Grid
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
-    fetchProducts
+  fetchProducts
 } from "../redux/productSlice";
 
 import {
-    fetchStock,
-    addStock,
-    deleteStock
+  fetchStock,
+  addStock,
+  deleteStock,
+  updateStock
 } from "../redux/stockSlice";
 
 import DataTable from "../components/DataTable";
-import { updateStock } from "../redux/stockSlice";
 
 export default function StockPage() {
 
-    const dispatch = useDispatch();
-    const products = useSelector((s) => s.products);
-    const stock = useSelector((s) => s.stock);
+  const dispatch = useDispatch();
+  const products = useSelector((s) => s.products);
+  const stock = useSelector((s) => s.stock);
 
-    const [date, setDate] = useState("");
-    const [productId, setProductId] = useState("");
-    const [outQty, setOutQty] = useState("");
+  const [date, setDate] = useState("");
+  const [productId, setProductId] = useState("");
+  const [outQty, setOutQty] = useState("");
 
-    useEffect(() => {
-        dispatch(fetchProducts());
-        dispatch(fetchStock());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchStock());
+  }, [dispatch]);
 
-    const handleCreate = () => {
-        const product = products.find(p => p.id === productId);
+  const handleCreate = () => {
+    const product = products.find(p => p.id === productId);
 
-        if (!product) return;
+    if (!product) return;
 
-        if (outQty > product.totalQuantity) {
-            alert("Limited stock! Cannot add this quantity.");
-            return;
-        }
+    if (outQty > product.totalQuantity) {
+      alert("Limited stock! Cannot add this quantity.");
+      return;
+    }
 
-        dispatch(addStock({ date, productId, outQuantity: outQty }));
-    };
+    dispatch(addStock({ date, productId, outQuantity: outQty }));
+  };
 
-    const columns = [
-        { field: "entryDate", header: "Date" },
+  const columns = [
+    { field: "entryDate", header: "Date" },
 
-        {
-            header: "Product",
-            render: (row) => row.product?.name
-        },
+    {
+      header: "Product",
+      render: (row) => row.product?.name
+    },
 
-        { field: "outQuantity", header: "Out" },
-        { field: "leftInStock", header: "Left" },
+    { field: "outQuantity", header: "Out" },
+    { field: "leftInStock", header: "Left" },
 
-        // ✅ EDIT BUTTON
-        {
-            header: "Edit",
-            render: (row) => (
-                <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => {
-                        const newQty = prompt("Enter new Out Quantity", row.outQuantity);
+    {
+      header: "Edit",
+      render: (row) => (
+        <Button
+          size="small"
+          variant="outlined"
+          fullWidth
+          onClick={() => {
+            const newQty = prompt("New Out Quantity", row.outQuantity);
 
-                        if (!newQty) return;
+            if (!newQty) return;
 
-                        if (newQty > row.product.totalQuantity) {
-                            alert("Limited stock! Cannot update.");
-                            return;
-                        }
+            if (newQty > row.product.totalQuantity) {
+              alert("Limited stock!");
+              return;
+            }
 
-                        dispatch(updateStock({
-                            id: row.id,
-                            data: {
-                                productId: row.product.id,
-                                outQuantity: newQty,
-                                date: row.entryDate
-                            }
-                        }));
-                    }}
-                >
-                    Edit
-                </Button>
-            )
-        },
+            dispatch(updateStock({
+              id: row.id,
+              data: {
+                productId: row.product.id,
+                outQuantity: newQty,
+                date: row.entryDate
+              }
+            }));
+          }}
+        >
+          Edit
+        </Button>
+      )
+    },
 
-        // DELETE
-        {
-            header: "Delete",
-            render: (row) => (
-                <Button
-                    color="error"
-                    size="small"
-                    onClick={() => dispatch(deleteStock(row.id))}
-                >
-                    Delete
-                </Button>
-            )
-        }
-    ];
+    {
+      header: "Delete",
+      render: (row) => (
+        <Button
+          color="error"
+          size="small"
+          fullWidth
+          onClick={() => dispatch(deleteStock(row.id))}
+        >
+          Delete
+        </Button>
+      )
+    }
+  ];
 
-    return (
-        <Container sx={{ mt: 4 }}>
+  return (
+    <Container maxWidth="lg" sx={{ mt: 3 }}>
 
-            <Typography variant="h5" gutterBottom>
-                Stock Entry
-            </Typography>
+      <Typography variant="h5" gutterBottom>
+        Stock Entry
+      </Typography>
 
-            <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+      <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
 
-                <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+        <Grid container spacing={2}>
 
-                    <TextField
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                    />
+          <Grid item xs={12} md={3}>
+            <TextField
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              fullWidth
+            />
+          </Grid>
 
-                    <Select
-                        value={productId}
-                        displayEmpty
-                        onChange={(e) => setProductId(e.target.value)}
-                        sx={{ minWidth: 180 }}
-                    >
-                        <MenuItem value="">Select Product</MenuItem>
-                        {products.map(p => (
-                            <MenuItem key={p.id} value={p.id}>
-                                {p.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
+          <Grid item xs={12} md={3}>
+            <Select
+              value={productId}
+              onChange={(e) => setProductId(e.target.value)}
+              fullWidth
+              displayEmpty
+            >
+              <MenuItem value="">Select Product</MenuItem>
+              {products.map(p => (
+                <MenuItem key={p.id} value={p.id}>
+                  {p.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
 
-                    <TextField
-                        label="Out Quantity"
-                        type="number"
-                        value={outQty}
-                        onChange={(e) => setOutQty(e.target.value)}
-                    />
+          <Grid item xs={12} md={3}>
+            <TextField
+              label="Out Quantity"
+              type="number"
+              value={outQty}
+              onChange={(e) => setOutQty(e.target.value)}
+              fullWidth
+            />
+          </Grid>
 
-                    <Button variant="contained" onClick={handleCreate}>
-                        Create
-                    </Button>
+          <Grid item xs={12} md={3}>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleCreate}
+            >
+              Create
+            </Button>
+          </Grid>
 
-                    {/* ✅ RIGHT ALIGNED EXPORT */}
-                    <Box sx={{ flexGrow: 1 }} />
+          {/* Export Button */}
+          <Grid item xs={12}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  window.open("https://non-stop-b-production.up.railway.app/stock/export")
+                }
+              >
+                Export Excel
+              </Button>
+            </Box>
+          </Grid>
 
-                    <Button
-                        variant="outlined"
-                        onClick={() =>
-                            window.open("https://non-stop-b-production.up.railway.app/stock/export")
-                        }
-                    >
-                        Export Excel
-                    </Button>
+        </Grid>
 
-                </Box>
+      </Paper>
 
-            </Paper>
+      <Box sx={{ overflowX: "auto" }}>
+        <DataTable columns={columns} rows={stock} />
+      </Box>
 
-            <DataTable columns={columns} rows={stock} />
-
-        </Container>
-    );
+    </Container>
+  );
 }
