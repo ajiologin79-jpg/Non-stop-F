@@ -40,7 +40,7 @@ export default function StockPage() {
     }, [dispatch]);
 
     const handleCreate = () => {
-        const product = products.find(p => p.id == productId);
+        const product = products.find(p => p.id === productId);
 
         if (!product) return;
 
