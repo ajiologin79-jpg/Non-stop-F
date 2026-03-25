@@ -168,7 +168,7 @@ export default function StockPage() {
           color: "#1e293b"
         }}
       >
-        📊 Kalyan Enterprises Stock Panel
+        📊 Stock Panel
       </Typography>
 
       {/* 3D CARD */}

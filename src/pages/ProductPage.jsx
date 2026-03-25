@@ -104,7 +104,7 @@ export default function ProductPage() {
           color: "#1e293b"
         }}
       >
-        🏪 Kalyan Enterprises Product Panel
+        🏪 Product Panel
       </Typography>
 
       <Box
