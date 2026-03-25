@@ -12,10 +12,8 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import {
-  fetchProducts
-} from "../redux/productSlice";
 
+import { fetchProducts } from "../redux/productSlice";
 import {
   fetchStock,
   addStock,
@@ -24,6 +22,14 @@ import {
 } from "../redux/stockSlice";
 
 import DataTable from "../components/DataTable";
+
+const premiumCard = {
+  backdropFilter: "blur(10px)",
+  background: "rgba(255,255,255,0.1)",
+  borderRadius: "20px",
+  boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+  padding: 3
+};
 
 export default function StockPage() {
 
@@ -70,9 +76,8 @@ export default function StockPage() {
         <Button
           size="small"
           variant="outlined"
-          fullWidth
           onClick={() => {
-            const newQty = prompt("New Out Quantity", row.outQuantity);
+            const newQty = prompt("New Quantity", row.outQuantity);
 
             if (!newQty) return;
 
@@ -102,7 +107,6 @@ export default function StockPage() {
         <Button
           color="error"
           size="small"
-          fullWidth
           onClick={() => dispatch(deleteStock(row.id))}
         >
           Delete
@@ -112,80 +116,96 @@ export default function StockPage() {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 3 }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
 
       <Typography variant="h5" gutterBottom>
-        Stock Entry
+        📊 Stock Entry
       </Typography>
 
-      <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+      <Box
+        sx={{
+          transform: "perspective(1000px) rotateX(2deg)",
+          transition: "0.3s",
+          "&:hover": {
+            transform: "perspective(1000px) rotateX(0deg) scale(1.01)"
+          }
+        }}
+      >
+        <Paper sx={premiumCard}>
 
-        <Grid container spacing={2}>
+          <Grid container spacing={2}>
 
-          <Grid item xs={12} md={3}>
-            <TextField
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              fullWidth
-            />
-          </Grid>
+            <Grid item xs={12} md={3}>
+              <TextField
+                type="date"
+                fullWidth
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                sx={{ background: "#fff", borderRadius: 2 }}
+              />
+            </Grid>
 
-          <Grid item xs={12} md={3}>
-            <Select
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-              fullWidth
-              displayEmpty
-            >
-              <MenuItem value="">Select Product</MenuItem>
-              {products.map(p => (
-                <MenuItem key={p.id} value={p.id}>
-                  {p.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <TextField
-              label="Out Quantity"
-              type="number"
-              value={outQty}
-              onChange={(e) => setOutQty(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handleCreate}
-            >
-              Create
-            </Button>
-          </Grid>
-
-          {/* Export Button */}
-          <Grid item xs={12}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button
-                variant="outlined"
-                onClick={() =>
-                  window.open("https://non-stop-b-production.up.railway.app/stock/export")
-                }
+            <Grid item xs={12} md={3}>
+              <Select
+                fullWidth
+                value={productId}
+                onChange={(e) => setProductId(e.target.value)}
+                sx={{ background: "#fff", borderRadius: 2 }}
               >
-                Export Excel
+                <MenuItem value="">Select Product</MenuItem>
+                {products.map(p => (
+                  <MenuItem key={p.id} value={p.id}>
+                    {p.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+
+            <Grid item xs={12} md={3}>
+              <TextField
+                label="Out Quantity"
+                type="number"
+                fullWidth
+                value={outQty}
+                onChange={(e) => setOutQty(e.target.value)}
+                sx={{ background: "#fff", borderRadius: 2 }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={3}>
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{
+                  height: "100%",
+                  background: "linear-gradient(135deg, #22c55e, #16a34a)"
+                }}
+                onClick={handleCreate}
+              >
+                Create Entry
               </Button>
-            </Box>
+            </Grid>
+
+            {/* EXPORT BUTTON */}
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    window.open("https://non-stop-b-production.up.railway.app/stock/export")
+                  }
+                >
+                  Export Excel
+                </Button>
+              </Box>
+            </Grid>
+
           </Grid>
 
-        </Grid>
+        </Paper>
+      </Box>
 
-      </Paper>
-
-      <Box sx={{ overflowX: "auto" }}>
+      <Box sx={{ mt: 3, overflowX: "auto" }}>
         <DataTable columns={columns} rows={stock} />
       </Box>
 

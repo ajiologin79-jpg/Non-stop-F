@@ -2,10 +2,10 @@ import {
   Container,
   TextField,
   Button,
-  Paper,
   Box,
   Typography,
-  Grid
+  Grid,
+  Paper
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,14 @@ import {
 } from "../redux/productSlice";
 
 import DataTable from "../components/DataTable";
+
+const premiumCard = {
+  backdropFilter: "blur(10px)",
+  background: "rgba(255,255,255,0.1)",
+  borderRadius: "20px",
+  boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+  padding: 3
+};
 
 export default function ProductPage() {
 
@@ -48,7 +56,6 @@ export default function ProductPage() {
         <Button
           size="small"
           variant="outlined"
-          fullWidth
           onClick={() => {
             const newQty = prompt("New Quantity", row.totalQuantity);
             if (newQty) {
@@ -68,9 +75,8 @@ export default function ProductPage() {
       header: "Delete",
       render: (row) => (
         <Button
-          size="small"
           color="error"
-          fullWidth
+          size="small"
           onClick={() => dispatch(deleteProduct(row.id))}
         >
           Delete
@@ -80,49 +86,66 @@ export default function ProductPage() {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 3 }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
 
       <Typography variant="h5" gutterBottom>
-        Product Management
+        📦 Product Management
       </Typography>
 
-      <Paper sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-        <Grid container spacing={2}>
+      <Box
+        sx={{
+          transform: "perspective(1000px) rotateX(2deg)",
+          transition: "0.3s",
+          "&:hover": {
+            transform: "perspective(1000px) rotateX(0deg) scale(1.01)"
+          }
+        }}
+      >
+        <Paper sx={premiumCard}>
 
-          <Grid item xs={12} md={4}>
-            <TextField
-              label="Product Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-            />
+          <Grid container spacing={2}>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Product Name"
+                fullWidth
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                sx={{ background: "#fff", borderRadius: 2 }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Quantity"
+                type="number"
+                fullWidth
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+                sx={{ background: "#fff", borderRadius: 2 }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{
+                  height: "100%",
+                  background: "linear-gradient(135deg, #22c55e, #16a34a)"
+                }}
+                onClick={handleAdd}
+              >
+                Add Product
+              </Button>
+            </Grid>
+
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <TextField
-              label="Quantity"
-              type="number"
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-              fullWidth
-            />
-          </Grid>
+        </Paper>
+      </Box>
 
-          <Grid item xs={12} md={4}>
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{ height: "100%" }}
-              onClick={handleAdd}
-            >
-              Add Product
-            </Button>
-          </Grid>
-
-        </Grid>
-      </Paper>
-
-      <Box sx={{ overflowX: "auto" }}>
+      <Box sx={{ mt: 3, overflowX: "auto" }}>
         <DataTable columns={columns} rows={products} />
       </Box>
 
