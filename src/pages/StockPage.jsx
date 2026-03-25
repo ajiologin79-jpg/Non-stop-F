@@ -24,11 +24,12 @@ import {
 import DataTable from "../components/DataTable";
 
 const premiumCard = {
-  backdropFilter: "blur(10px)",
-  background: "rgba(255,255,255,0.1)",
+  backdropFilter: "blur(20px)",
+  background: "linear-gradient(145deg, #1e293b, #0f172a)",
   borderRadius: "20px",
-  boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
-  padding: 3
+  boxShadow: "0 15px 40px rgba(0,0,0,0.5)",
+  padding: 3,
+  color: "#fff"
 };
 
 export default function StockPage() {
@@ -46,19 +47,34 @@ export default function StockPage() {
     dispatch(fetchStock());
   }, [dispatch]);
 
-  const handleCreate = () => {
-    const product = products.find(p => p.id === productId);
+  // ✅ CREATE STOCK
+  const handleCreate = async () => {
+    const product = products.find(
+      (p) => String(p.id) === String(productId)
+    );
 
     if (!product) return;
 
     if (outQty > product.totalQuantity) {
-      alert("Limited stock! Cannot add this quantity.");
+      alert("Limited stock!");
       return;
     }
 
-    dispatch(addStock({ date, productId, outQuantity: outQty }));
+    await dispatch(addStock({
+      date,
+      productId,
+      outQuantity: outQty
+    }));
+
+    dispatch(fetchStock());
+    dispatch(fetchProducts());
+
+    setDate("");
+    setProductId("");
+    setOutQty("");
   };
 
+  // ✅ TABLE COLUMNS
   const columns = [
     { field: "entryDate", header: "Date" },
 
@@ -75,16 +91,11 @@ export default function StockPage() {
       render: (row) => (
         <Button
           size="small"
-          variant="outlined"
+          variant="contained"
+          sx={{ background: "#3b82f6" }}
           onClick={() => {
             const newQty = prompt("New Quantity", row.outQuantity);
-
             if (!newQty) return;
-
-            if (newQty > row.product.totalQuantity) {
-              alert("Limited stock!");
-              return;
-            }
 
             dispatch(updateStock({
               id: row.id,
@@ -105,8 +116,9 @@ export default function StockPage() {
       header: "Delete",
       render: (row) => (
         <Button
-          color="error"
           size="small"
+          variant="contained"
+          color="error"
           onClick={() => dispatch(deleteStock(row.id))}
         >
           Delete
@@ -118,16 +130,26 @@ export default function StockPage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
 
-      <Typography variant="h5" gutterBottom>
-        📊 Stock Entry
+      {/* HEADER */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: "bold",
+          mb: 3,
+          textAlign: "center",
+          color: "#1e293b"
+        }}
+      >
+        📊 Kalyan Enterprises Stock Panel
       </Typography>
 
+      {/* 3D CARD */}
       <Box
         sx={{
-          transform: "perspective(1000px) rotateX(2deg)",
-          transition: "0.3s",
+          transform: "perspective(1200px) rotateX(4deg)",
+          transition: "0.4s",
           "&:hover": {
-            transform: "perspective(1000px) rotateX(0deg) scale(1.01)"
+            transform: "perspective(1200px) rotateX(0deg) scale(1.02)"
           }
         }}
       >
@@ -135,6 +157,7 @@ export default function StockPage() {
 
           <Grid container spacing={2}>
 
+            {/* DATE */}
             <Grid item xs={12} md={3}>
               <TextField
                 type="date"
@@ -145,15 +168,35 @@ export default function StockPage() {
               />
             </Grid>
 
+            {/* ✅ FIXED DROPDOWN */}
             <Grid item xs={12} md={3}>
               <Select
                 fullWidth
-                value={productId}
+                value={productId || ""}
+                displayEmpty
+                renderValue={(selected) => {
+                  if (!selected) {
+                    return (
+                      <span style={{ color: "#9ca3af" }}>
+                        Select Product
+                      </span>
+                    );
+                  }
+
+                  const product = products.find(
+                    (p) => String(p.id) === String(selected)
+                  );
+
+                  return product ? product.name : "";
+                }}
                 onChange={(e) => setProductId(e.target.value)}
                 sx={{ background: "#fff", borderRadius: 2 }}
               >
-                <MenuItem value="">Select Product</MenuItem>
-                {products.map(p => (
+                <MenuItem value="">
+                  <em>Select Product</em>
+                </MenuItem>
+
+                {products.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.name}
                   </MenuItem>
@@ -161,6 +204,7 @@ export default function StockPage() {
               </Select>
             </Grid>
 
+            {/* OUT QTY */}
             <Grid item xs={12} md={3}>
               <TextField
                 label="Out Quantity"
@@ -172,13 +216,16 @@ export default function StockPage() {
               />
             </Grid>
 
+            {/* BUTTON */}
             <Grid item xs={12} md={3}>
               <Button
                 variant="contained"
                 fullWidth
                 sx={{
                   height: "100%",
-                  background: "linear-gradient(135deg, #22c55e, #16a34a)"
+                  fontWeight: "bold",
+                  background: "linear-gradient(135deg,#22c55e,#16a34a)",
+                  boxShadow: "0 10px 30px rgba(34,197,94,0.5)"
                 }}
                 onClick={handleCreate}
               >
@@ -186,11 +233,12 @@ export default function StockPage() {
               </Button>
             </Grid>
 
-            {/* EXPORT BUTTON */}
+            {/* EXPORT */}
             <Grid item xs={12}>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <Button
                   variant="outlined"
+                  sx={{ color: "#fff", borderColor: "#fff" }}
                   onClick={() =>
                     window.open("https://non-stop-b-production.up.railway.app/stock/export")
                   }
@@ -205,6 +253,7 @@ export default function StockPage() {
         </Paper>
       </Box>
 
+      {/* TABLE */}
       <Box sx={{ mt: 3, overflowX: "auto" }}>
         <DataTable columns={columns} rows={stock} />
       </Box>
