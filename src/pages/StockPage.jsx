@@ -74,7 +74,7 @@ export default function StockPage() {
     setOutQty("");
   };
 
-  // ✅ TABLE COLUMNS
+  // ✅ TABLE COLUMNS (🔥 UPDATED LEFT COLUMN)
   const columns = [
     { field: "entryDate", header: "Date" },
 
@@ -84,7 +84,35 @@ export default function StockPage() {
     },
 
     { field: "outQuantity", header: "Out" },
-    { field: "leftInStock", header: "Left" },
+
+    // 🔥 PREMIUM LOW STOCK UI
+    {
+      header: "Left",
+      render: (row) => {
+        const isLow = row.leftInStock < 10;
+
+        return (
+          <Box
+            sx={{
+              px: 2,
+              py: 0.5,
+              borderRadius: "12px",
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "#fff",
+              background: isLow
+                ? "linear-gradient(135deg, #ef4444, #b91c1c)"
+                : "linear-gradient(135deg, #22c55e, #16a34a)",
+              boxShadow: isLow
+                ? "0 4px 15px rgba(239,68,68,0.6)"
+                : "0 4px 15px rgba(34,197,94,0.6)"
+            }}
+          >
+            {row.leftInStock}
+          </Box>
+        );
+      }
+    },
 
     {
       header: "Edit",
@@ -168,7 +196,7 @@ export default function StockPage() {
               />
             </Grid>
 
-            {/* ✅ FIXED DROPDOWN */}
+            {/* DROPDOWN */}
             <Grid item xs={12} md={3}>
               <Select
                 fullWidth
